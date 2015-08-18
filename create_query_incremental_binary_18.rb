@@ -2,7 +2,7 @@ require 'securerandom'
 require 'date'
 require 'uuid'
 
-uuid = UUID.new
+uuid = UUID.new # gem install uuid
 
 (1..5000000).each { |i|
   from_user_id = '0x'+ SecureRandom.hex(2) + uuid.generate.gsub(/-/, "")

@@ -35,6 +35,7 @@ MySQLのInnoDBには、int(4byte)よりも大きなサイズのカラムにイ�
 indexは実際に使うことが多いような日付と合わせた複合インデックスを用意し、
 さらにデータ量がおなじになるようにdummyでパディングしてあります。
 
+int向け:
 
 ```sql:int(4bytes)用のテーブル
 create table `user_relations` (
@@ -46,9 +47,9 @@ create table `user_relations` (
 PRIMARY KEY (`from_user_id`, `to_user_id`),
 INDEX `relation_index_created_time` (`from_user_id`, `to_user_id`, `created_time` )
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=latin1
-
 ```
 
+bigint向け:
 
 ```sql:bigint(8 bytes)のテーブル
 create table `user_relations` (
@@ -60,15 +61,13 @@ create table `user_relations` (
 PRIMARY KEY (`from_user_id`, `to_user_id`),
 INDEX `relation_index_created_time` (`from_user_id`, `to_user_id`, `created_time` )
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=latin1
-
 ```
-
 
 以上のようなテーブル構成です。また、rubyで簡単にデータ作成スクリプトを用意しました。
 なお、DATETIME(8bytes)にいれるデータは、あまりにもカーディナリティが大きくならないように
 2015年から2025年の日付しか入らないようにしてあります。
 
-
+ランダムint向け:
 ```ruby:ランダムなintのクエリ生成スクリプト
 require 'securerandom'
 require "date"
@@ -84,10 +83,10 @@ require "date"
   # より現実に即すようにわざとバルクインサートにしない
   puts "insert into user_relations values(#{from_user_id}, #{to_user_id},'#{from_user_id_dummy}', '#{to_user_id_dummy}', '#{date}');"
 }
-
 ```
 
-```ruby:ランダムなlongのクエリ生成スクリプト
+ランダムbigint向け:
+```ruby:ランダムなbigintのクエリ生成スクリプト
 require 'securerandom'
 require "date"
 (1..5000000).each { |i|
@@ -102,9 +101,9 @@ require "date"
   # より現実に即すようにわざとバルクインサートにしない
   puts "insert into user_relations values(#{from_user_id}, #{to_user_id},'#{from_user_id_dummy}', '#{to_user_id_dummy}', '#{date}');"
 }
-
 ```
 
+インクリメンタルbigint向け:
 ```ruby: インクリメンタルなlongのクエリ生成スクリプト
 require 'securerandom'
 require "date"
@@ -120,7 +119,6 @@ require "date"
   # より現実に即すようにわざとバルクインサートにしない
   puts "insert into user_relations values(#{from_user_id}, #{to_user_id},'#{from_user_id_dummy}', '#{to_user_id_dummy}', '#{date}');"
 }
-
 ```
 
 ## 結果
@@ -191,12 +189,13 @@ create table `user_relations` (
 PRIMARY KEY (`from_user_id`, `to_user_id`),
 INDEX `relation_index_created_time` (`from_user_id`, `to_user_id`, `created_time` )
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=latin1
-
 ```
 
 以上のようなテーブル構成です。
 
 クエリ作成スクリプトは以下のとおり。
+
+UUIDv1+シャードID向け:
 
 ```ruby:UUIDv1+シャードIDのもの
 require 'securerandom'
@@ -219,6 +218,8 @@ uuid = UUID.new
 }
 
 ```
+
+シャードID+UUIDv1向け:
 
 ```ruby:シャードID+UUIDv1のもの
 require 'securerandom'

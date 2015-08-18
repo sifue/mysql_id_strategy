@@ -35,9 +35,9 @@ MySQLのInnoDBには、int(4byte)よりも大きなサイズのカラムにイ�
 indexは実際に使うことが多いような日付と合わせた複合インデックスを用意し、
 さらにデータ量がおなじになるようにdummyでパディングしてあります。
 
-int向け:
+int(4bytes)用のテーブル:
 
-```sql:int(4bytes)用のテーブル
+```sql
 create table `user_relations` (
 `from_user_id` int NOT NULL,
 `to_user_id`  int NOT NULL,
@@ -49,9 +49,9 @@ INDEX `relation_index_created_time` (`from_user_id`, `to_user_id`, `created_time
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=latin1
 ```
 
-bigint向け:
+bigint(8 bytes)のテーブル:
 
-```sql:bigint(8 bytes)のテーブル
+```sql
 create table `user_relations` (
 `from_user_id` bigint NOT NULL,
 `to_user_id`  bigint NOT NULL,
@@ -67,8 +67,9 @@ INDEX `relation_index_created_time` (`from_user_id`, `to_user_id`, `created_time
 なお、DATETIME(8bytes)にいれるデータは、あまりにもカーディナリティが大きくならないように
 2015年から2025年の日付しか入らないようにしてあります。
 
-ランダムint向け:
-```ruby:ランダムなintのクエリ生成スクリプト
+ランダムなintのクエリ生成スクリプト:
+
+```ruby
 require 'securerandom'
 require "date"
 (1..5000000).each { |i|
@@ -85,8 +86,9 @@ require "date"
 }
 ```
 
-ランダムbigint向け:
-```ruby:ランダムなbigintのクエリ生成スクリプト
+ランダムなintのクエリ生成スクリプト:
+
+```ruby
 require 'securerandom'
 require "date"
 (1..5000000).each { |i|
@@ -103,8 +105,9 @@ require "date"
 }
 ```
 
-インクリメンタルbigint向け:
-```ruby: インクリメンタルなlongのクエリ生成スクリプト
+ランダムなintのクエリ生成スクリプト:
+
+```ruby
 require 'securerandom'
 require "date"
 (1..5000000).each { |i|
@@ -179,7 +182,9 @@ MySQL InnoDBにシャードIDと一緒に入れたい場合には、UUIDv1を使
 ## 実験の構成
 テーブルの構成は以下のようになります。
 
-```sql:バイナリ(18bytes)をキーに持つテーブル
+バイナリ(18bytes)をキーに持つテーブル:
+
+```sql
 create table `user_relations` (
 `from_user_id` binary(18) NOT NULL,
 `to_user_id`  binary(18) NOT NULL,
@@ -197,7 +202,7 @@ INDEX `relation_index_created_time` (`from_user_id`, `to_user_id`, `created_time
 
 UUIDv1+シャードID向け:
 
-```ruby:UUIDv1+シャードIDのもの
+```ruby
 require 'securerandom'
 require 'date'
 require 'uuid'
@@ -221,7 +226,7 @@ uuid = UUID.new
 
 シャードID+UUIDv1向け:
 
-```ruby:シャードID+UUIDv1のもの
+```ruby
 require 'securerandom'
 require 'date'
 require 'uuid'
